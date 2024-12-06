@@ -22,7 +22,7 @@ public class HitStatsMapper {
                 .build();
     }
 
-    public static List<HitStatsDto> ToHitStatsDtoList(List<HitStats> hitStatsList) {
+    public static List<HitStatsDto> toHitStatsDtoList(List<HitStats> hitStatsList) {
         return hitStatsList.stream()
                 .map(HitStatsMapper::toHitStatsDto)
                 .toList();

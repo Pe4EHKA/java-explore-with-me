@@ -29,7 +29,7 @@ public class StatsServiceImpl implements StatsService {
         if (start.isAfter(end)) {
             throw new DateTimeException("Time 'start' can't be after 'end'");
         }
-        return HitStatsMapper.ToHitStatsDtoList(unique ? statsRepository.findUniqueHitStats(start, end, uris) :
+        return HitStatsMapper.toHitStatsDtoList(unique ? statsRepository.findUniqueHitStats(start, end, uris) :
                 statsRepository.findHitStats(start, end, uris));
     }
 
