@@ -28,18 +28,14 @@ public class RestStatClient implements StatClient {
         String url = UriComponentsBuilder.fromHttpUrl(statUrl + "/hit")
                 .build()
                 .toUriString();
-        try {
-            return restClient.post()
-                    .uri(url)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .body(createHitDto)
-                    .retrieve()
-                    .toEntity(CreateHitDto.class);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(e.getMessage());
-        }
+
+        return restClient.post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(createHitDto)
+                .retrieve()
+                .toEntity(CreateHitDto.class);
     }
 
     @Override
