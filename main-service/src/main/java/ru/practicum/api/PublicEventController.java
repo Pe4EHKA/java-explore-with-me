@@ -19,7 +19,7 @@ import java.util.Set;
 @Slf4j
 public class PublicEventController {
 
-    public final EventService EventService;
+    public final EventService eventService;
 
     @GetMapping
     public Set<EventShortDto> getAllEvents(@RequestParam(required = false) String text,
@@ -47,13 +47,13 @@ public class PublicEventController {
 
         log.info("Get all events with params: {}", publicRequestParamForEvent);
 
-        return EventService.getAllEvents(publicRequestParamForEvent);
+        return eventService.getAllEvents(publicRequestParamForEvent);
     }
 
     @GetMapping("/{id}")
     public EventFullDto getEvent(@PathVariable("id") Long id,
                                  HttpServletRequest httpServletRequest) {
         log.info("Get event with id {}", id);
-        return EventService.getEvent(id, httpServletRequest);
+        return eventService.getEvent(id, httpServletRequest);
     }
 }

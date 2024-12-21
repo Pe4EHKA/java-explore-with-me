@@ -14,13 +14,13 @@ import ru.practicum.common.service.CategoryService;
 @RequiredArgsConstructor
 @Slf4j
 public class AdminCategoriesController {
-    private final CategoryService CategoriesService;
+    private final CategoryService categoriesService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto create(@Valid @RequestBody NewCategoryDto newCategoryDto) {
         log.info("POST Admin Create new category: {}", newCategoryDto);
-        return CategoriesService.createCategory(newCategoryDto);
+        return categoriesService.createCategory(newCategoryDto);
     }
 
     @PatchMapping("/{catId}")
@@ -28,13 +28,13 @@ public class AdminCategoriesController {
     public CategoryDto update(@Valid @RequestBody CategoryDto categoryDto,
                               @PathVariable(name = "catId") Long catId) {
         log.info("PATCH Admin Update category: {}", categoryDto);
-        return CategoriesService.update(categoryDto, catId);
+        return categoriesService.update(categoryDto, catId);
     }
 
     @DeleteMapping("/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable(name = "catId") Long catId) {
         log.info("DELETE Admin Delete category: {}", catId);
-        CategoriesService.deleteCategory(catId);
+        categoriesService.deleteCategory(catId);
     }
 }
