@@ -74,6 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         try {
             categoryRepository.save(categoryOld);
+            categoryRepository.flush();
         } catch (DataIntegrityViolationException e) {
             throw new ConflictException(String.format("Category with name '%s' already exists", categoryDto.getName()));
         }
@@ -85,6 +86,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategory(Long catId) {
         if (eventRepository.existsByCategoryId(catId)) {
             throw new ConditionsNotMetException(String.format("Category with id: %d still in use with event", catId));

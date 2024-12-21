@@ -100,6 +100,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public void delete(Long compId) {
         log.info("Delete compilation with id {}", compId);
         compilationRepository.deleteById(compId);
