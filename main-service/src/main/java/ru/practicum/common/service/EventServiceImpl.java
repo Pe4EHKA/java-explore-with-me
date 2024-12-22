@@ -78,7 +78,7 @@ public class EventServiceImpl implements EventService {
                         new NotFoundException("Event not found with id: " + eventId + "and userId: " + userId));
         log.info("Got Event: {}", event);
 
-        return EventMapper.toEventFullDto(event, getViewsEvent("/events/" + event.getId()));
+        return EventMapper.toEventFullDto(event, null);
     }
 
     @Override
@@ -195,15 +195,10 @@ public class EventServiceImpl implements EventService {
                 param.getRangeEnd(),
                 pageable);
 
-        List<String> uris = events.stream()
-                .map(event -> "/events/" + event.getId())
-                .toList();
-
-        Map<Long, Long> views = getViewsEvents(uris);
 
         List<EventFullDto> eventFullDtos = events.stream()
-                        .map(event -> EventMapper.toEventFullDto(event, views.get(event.getId())))
-                        .toList();
+                .map(event -> EventMapper.toEventFullDto(event, null))
+                .toList();
 
 
         log.info("Got events {} for params {}", events, param);
@@ -252,8 +247,7 @@ public class EventServiceImpl implements EventService {
             throw new ConflictException(e.getMessage());
         }
         log.info("Event updated: {}", current);
-        return EventMapper.toEventFullDto(current,
-                getViewsEvent("/events/" + current.getId()));
+        return EventMapper.toEventFullDto(current, null);
     }
 
     @Override
@@ -299,8 +293,6 @@ public class EventServiceImpl implements EventService {
         }
 
         long views = getViewsEvent(httpServletRequest.getRequestURI());
-
-        eventRepository.save(event);
 
         hitEndpoint(httpServletRequest);
 
