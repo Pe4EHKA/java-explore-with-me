@@ -35,12 +35,11 @@ import ru.practicum.common.repository.RequestRepository;
 import ru.practicum.common.repository.UserRepository;
 import ru.practicum.common.repository.event.EventRepository;
 import ru.practicum.dto.CreateHitDto;
+import ru.practicum.dto.HitStatsDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -79,7 +78,7 @@ public class EventServiceImpl implements EventService {
                         new NotFoundException("Event not found with id: " + eventId + "and userId: " + userId));
         log.info("Got Event: {}", event);
 
-        return EventMapper.toEventFullDto(event);
+        return EventMapper.toEventFullDto(event, getViewsEvent("/events/" + event.getId()));
     }
 
     @Override
@@ -105,7 +104,6 @@ public class EventServiceImpl implements EventService {
         event.setPublishedOn(LocalDateTime.now());
         event.setInitiator(userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id: %d not found", userId))));
-        event.setViews(0L);
 
         try {
             event = eventRepository.save(event);
@@ -115,7 +113,7 @@ public class EventServiceImpl implements EventService {
 
         log.info("Created Event: {}", event);
 
-        return EventMapper.toEventFullDto(event);
+        return EventMapper.toEventFullDto(event, 0L);
     }
 
     @Override
@@ -155,7 +153,7 @@ public class EventServiceImpl implements EventService {
         }
         log.info("Updated Event: {}", eventOld);
 
-        return EventMapper.toEventFullDto(eventOld);
+        return EventMapper.toEventFullDto(eventOld, getViewsEvent("/events/" + eventOld.getId()));
     }
 
     @Override
@@ -187,7 +185,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventFullDto> getALlEvents(AdminRequestParamForEvent param) {
         Pageable pageable = PageRequest
-                .of(param.getFrom() / param.getSize(), param.getSize(), Sort.by(Sort.Direction.ASC, "id"));
+                .of(param.getFrom() / param.getSize(),
+                        param.getSize(),
+                        Sort.by(Sort.Direction.ASC, "id"));
         List<Event> events = eventRepository.findWithParams(param.getUsers(),
                 param.getCategories(),
                 param.getStates(),
@@ -195,10 +195,19 @@ public class EventServiceImpl implements EventService {
                 param.getRangeEnd(),
                 pageable);
 
-        log.info("Got events {} for params {}", events, param);
-        return events.stream()
-                .map(EventMapper::toEventFullDto)
+        List<String> uris = events.stream()
+                .map(event -> "/events/" + event.getId())
                 .toList();
+
+        Map<Long, Long> views = getViewsEvents(uris);
+
+        List<EventFullDto> eventFullDtos = events.stream()
+                        .map(event -> EventMapper.toEventFullDto(event, views.get(event.getId())))
+                        .toList();
+
+
+        log.info("Got events {} for params {}", events, param);
+        return eventFullDtos;
     }
 
     @Override
@@ -243,7 +252,8 @@ public class EventServiceImpl implements EventService {
             throw new ConflictException(e.getMessage());
         }
         log.info("Event updated: {}", current);
-        return EventMapper.toEventFullDto(current);
+        return EventMapper.toEventFullDto(current,
+                getViewsEvent("/events/" + current.getId()));
     }
 
     @Override
@@ -263,6 +273,16 @@ public class EventServiceImpl implements EventService {
         Set<EventShortDto> eventShortDtos = EventMapper.toEventShortDtoSet(eventRepository
                 .findWithFilter(eventSearch, pageRequest).toSet());
 
+        List<String> uris = eventShortDtos.stream()
+                .map(event -> "/events/" + event.getId())
+                .toList();
+
+        Map<Long, Long> views = getViewsEvents(uris);
+
+        for (EventShortDto eventDto : eventShortDtos) {
+            eventDto.setViews(views.get(eventDto.getId()));
+        }
+
         log.info("Got events {}", eventShortDtos);
         hitEndpoint(publicRequestParamForEvent.getRequest());
 
@@ -278,16 +298,57 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException(String.format("Event with id %s is not published", eventId));
         }
 
-        ResponseEntity<?> response = statClient.getStats(event.getEventDate().toString(),
+        long views = getViewsEvent(httpServletRequest.getRequestURI());
+
+        eventRepository.save(event);
+
+        hitEndpoint(httpServletRequest);
+
+        log.info("Got event {}", event);
+
+        return EventMapper.toEventFullDto(event, views);
+    }
+
+    private Map<Long, Long> getViewsEvents(List<String> uris) {
+        Map<Long, Long> views = new HashMap<>();
+
+        ResponseEntity<?> response = statClient.getStats(LocalDateTime.now().minusYears(100).toString(),
                 LocalDateTime.now().plusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                List.of(httpServletRequest.getRequestURI()),
-                false);
+                uris,
+                true);
+
+        HitStatsDto[] stats = new HitStatsDto[0];
+
+        try {
+            stats = objectMapper.readValue(objectMapper.writeValueAsString(response.getBody()),
+                    HitStatsDto[].class);
+        } catch (Exception e) {
+            log.error("Failed to parse stats response", e);
+        }
+
+        for (HitStatsDto stat : stats) {
+            String uri = stat.getUri();
+            views.put(Long.parseLong(uri.substring(uri.lastIndexOf('/'))), stat.getHits());
+        }
+
+        return views;
+    }
+
+    private Long getViewsEvent(String request) {
+        ResponseEntity<?> response = statClient.getStats(LocalDateTime.now().minusYears(100).toString(),
+                LocalDateTime.now().plusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                List.of(request),
+                true);
 
         long hits = 0L;
 
         try {
-            StatsResponseDto[] stats = objectMapper.readValue(objectMapper.writeValueAsString(response.getBody()),
-                    StatsResponseDto[].class);
+            if (response.getBody() == null || response.getBody().toString().equals("[]")) {
+                return 0L;
+            }
+
+            HitStatsDto[] stats = objectMapper.readValue(response.getBody().toString(),
+                    HitStatsDto[].class);
 
             if (stats.length > 0) {
                 hits = stats[0].getHits();
@@ -297,14 +358,7 @@ public class EventServiceImpl implements EventService {
             log.error("Failed to parse stats response", e);
         }
 
-        event.setViews(hits + 1);
-        eventRepository.save(event);
-
-        hitEndpoint(httpServletRequest);
-
-        log.info("Got event {}", event);
-
-        return EventMapper.toEventFullDto(event);
+        return hits;
     }
 
     private EventRequestStatusUpdateResult handleRejectedRequests(List<Request> requests) {

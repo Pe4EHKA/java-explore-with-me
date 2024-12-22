@@ -3,6 +3,7 @@ package ru.practicum.common.exception;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,7 +31,9 @@ public class ErrorHandler {
                 e.getMessage());
     }
 
-    @ExceptionHandler ({ConflictException.class, JdbcSQLIntegrityConstraintViolationException.class})
+    @ExceptionHandler ({ConflictException.class,
+            JdbcSQLIntegrityConstraintViolationException.class,
+            DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleConflictException(final RuntimeException e) {
         log.error(e.getMessage(), e);

@@ -1,6 +1,7 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.CreateHitDto;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StatsServiceImpl implements StatsService {
     private final StatsRepository statsRepository;
 
@@ -29,8 +31,13 @@ public class StatsServiceImpl implements StatsService {
         if (start.isAfter(end)) {
             throw new DateTimeException("Time 'start' can't be after 'end'");
         }
-        return HitStatsMapper.toHitStatsDtoList(unique ? statsRepository.findUniqueHitStats(start, end, uris) :
+        List<HitStatsDto> hitStatsDtos = HitStatsMapper.toHitStatsDtoList(unique ?
+                statsRepository.findUniqueHitStats(start, end, uris) :
                 statsRepository.findHitStats(start, end, uris));
+
+        log.info("Got stats: {}", hitStatsDtos.toString());
+
+        return hitStatsDtos;
     }
 
 }

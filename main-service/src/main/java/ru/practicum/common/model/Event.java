@@ -5,7 +5,6 @@ import lombok.*;
 import ru.practicum.common.enums.State;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Table(name = "events")
@@ -67,20 +66,4 @@ public class Event {
 
     @Column(name = "title", nullable = false)
     private String title;
-
-    @Column(name = "views")
-    private Long views;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Event event = (Event) o;
-        return Objects.equals(id, event.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 }

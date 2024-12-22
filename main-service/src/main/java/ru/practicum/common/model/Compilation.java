@@ -29,17 +29,4 @@ public class Compilation {
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
     private Set<Event> events;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Compilation that = (Compilation) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 }

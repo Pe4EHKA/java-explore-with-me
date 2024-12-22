@@ -33,17 +33,4 @@ public class Request {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Request request = (Request) o;
-        return Objects.equals(id, request.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 }
