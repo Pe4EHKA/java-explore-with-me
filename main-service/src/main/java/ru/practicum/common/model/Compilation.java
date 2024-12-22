@@ -3,7 +3,6 @@ package ru.practicum.common.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
