@@ -23,7 +23,7 @@ public interface EventService {
     EventRequestStatusUpdateResult updateRequestStatus(Long userId, Long eventId,
                                                        EventRequestStatusUpdateRequest updateEventStatusRequest);
 
-    List<EventFullDto> getALlEvents(AdminRequestParamForEvent param);
+    List<EventFullDto> getAllEvents(AdminRequestParamForEvent param);
 
     EventFullDto update(Long eventId, UpdateEventAdminRequest updateEventAdminRequest);
 

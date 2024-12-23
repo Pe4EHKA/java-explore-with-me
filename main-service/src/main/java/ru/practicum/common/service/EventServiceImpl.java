@@ -153,7 +153,7 @@ public class EventServiceImpl implements EventService {
         }
         log.info("Updated Event: {}", eventOld);
 
-        return EventMapper.toEventFullDto(eventOld, getViewsEvent("/events/" + eventOld.getId()));
+        return EventMapper.toEventFullDto(eventOld, null);
     }
 
     @Override
@@ -183,7 +183,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventFullDto> getALlEvents(AdminRequestParamForEvent param) {
+    public List<EventFullDto> getAllEvents(AdminRequestParamForEvent param) {
         Pageable pageable = PageRequest
                 .of(param.getFrom() / param.getSize(),
                         param.getSize(),

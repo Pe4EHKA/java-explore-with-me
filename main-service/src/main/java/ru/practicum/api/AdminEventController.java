@@ -40,7 +40,7 @@ public class AdminEventController {
                 .from(from)
                 .size(size)
                 .build();
-        return adminEventService.getALlEvents(adminRequestParamForEvent);
+        return adminEventService.getAllEvents(adminRequestParamForEvent);
     }
 
     @PatchMapping("/{eventId}")
