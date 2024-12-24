@@ -3,6 +3,8 @@ package ru.practicum.common.service;
 import jakarta.servlet.http.HttpServletRequest;
 import ru.practicum.api.dto.AdminRequestParamForEvent;
 import ru.practicum.api.dto.PublicRequestParamForEvent;
+import ru.practicum.common.dto.comment.CommentDto;
+import ru.practicum.common.dto.comment.NewCommentDto;
 import ru.practicum.common.dto.event.*;
 import ru.practicum.common.dto.request.ParticipationRequestDto;
 
@@ -30,4 +32,16 @@ public interface EventService {
     Set<EventShortDto> getAllEvents(PublicRequestParamForEvent publicRequestParamForEvent);
 
     EventFullDto getEvent(Long eventId, HttpServletRequest httpServletRequest);
+
+    List<CommentDto> getAllComments(Long eventId);
+
+    CommentDto getComment(Long eventId, Long commentId);
+
+    CommentDto saveComment(Long eventId, Long userId, NewCommentDto newCommentDto);
+
+    CommentDto updateComment(Long eventId, Long userId, CommentDto commentDto);
+
+    void deleteComment(Long eventId, Long userId);
+
+    void deleteComment(Long commentId);
 }

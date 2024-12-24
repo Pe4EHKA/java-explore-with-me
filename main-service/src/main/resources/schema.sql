@@ -69,3 +69,15 @@ CREATE TABLE IF NOT EXISTS compilations_events
     FOREIGN KEY (compilation_id) REFERENCES compilations (id) ON DELETE CASCADE,
     FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS comments
+(
+    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
+    event_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    text VARCHAR(2048) NOT NULL,
+    CONSTRAINT pk_comments PRIMARY KEY (id),
+    CONSTRAINT unique_event_and_user UNIQUE (event_id, user_id),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

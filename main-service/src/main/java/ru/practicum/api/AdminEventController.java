@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.api.dto.AdminRequestParamForEvent;
 import ru.practicum.common.dto.event.EventFullDto;
@@ -48,5 +49,14 @@ public class AdminEventController {
                                @PathVariable(name = "eventId") Long eventId) {
         log.info("PUT Admin event: {}", updateEventAdminRequest);
         return adminEventService.update(eventId, updateEventAdminRequest);
+    }
+
+    @DeleteMapping("/{eventId}/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable(name = "eventId") Long eventId,
+                       @PathVariable(name = "commentId") Long commentId) {
+        log.info("DELETE Admin eventId: {} commentId: {}", eventId, commentId);
+
+        adminEventService.deleteComment(commentId);
     }
 }
