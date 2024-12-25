@@ -1,8 +1,6 @@
 package ru.practicum.common.dto.comment;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter

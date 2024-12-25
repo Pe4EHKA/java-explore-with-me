@@ -3,8 +3,6 @@ package ru.practicum.common.service;
 import jakarta.servlet.http.HttpServletRequest;
 import ru.practicum.api.dto.AdminRequestParamForEvent;
 import ru.practicum.api.dto.PublicRequestParamForEvent;
-import ru.practicum.common.dto.comment.CommentDto;
-import ru.practicum.common.dto.comment.NewCommentDto;
 import ru.practicum.common.dto.event.*;
 import ru.practicum.common.dto.request.ParticipationRequestDto;
 
