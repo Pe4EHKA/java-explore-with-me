@@ -805,6 +805,123 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Количество комментариев",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {",
+							"    const api = new API(pm);",
+							"    const rnd = new RandomUtils();",
+							"",
+							"    let comment;",
+							"    try {",
+							"        const user_event = await api.addUser(rnd.getUser());",
+							"        const user_comment1 = await api.addUser(rnd.getUser());",
+							"        const user_comment2 = await api.addUser(rnd.getUser());",
+							"        const category = await api.addCategory(rnd.getCategory());",
+							"        const event = rnd.getEvent(category.id);",
+							"        const addedevent = await api.addEvent(user_event.id, event);",
+							"        pm.collectionVariables.set(\"eid\", addedevent.id)",
+							"        await api.publishEvent(addedevent.id);",
+							"        const participantRequest1 = await api.publishParticipationRequest(addedevent.id, user_comment1.id);",
+							"        const participantRequest2 = await api.publishParticipationRequest(addedevent.id, user_comment2.id);",
+							"        await api.acceptParticipationRequest(addedevent.id, user_event.id, participantRequest1.id);",
+							"        await api.acceptParticipationRequest(addedevent.id, user_event.id, participantRequest2.id);",
+							"        comment = rnd.getComment();",
+							"        const addedComment1 = await api.addComment(user_comment1.id, addedevent.id, comment.text);",
+							"        const addedComment2 = await api.addComment(user_comment2.id, addedevent.id, comment.text);",
+							"",
+							"",
+							"        ",
+							"    } catch(err) {",
+							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
+							"    }",
+							"",
+							"    pm.request.body.update({",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify(comment),",
+							"        options: { raw: { language: 'json' } }",
+							"    });",
+							"};",
+							"",
+							"const interval = setInterval(() => {}, 1000);",
+							"",
+							"setTimeout(async () => ",
+							"    {",
+							"        try {",
+							"            await main();",
+							"        } catch (e) {",
+							"            console.error(e);",
+							"        } finally {",
+							"            clearInterval(interval);",
+							"        }",
+							"    },  ",
+							"    100 ",
+							");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {",
+							"    pm.response.to.have.status(200);  ",
+							"    pm.response.to.be.withBody;",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"const target = pm.response.json();",
+							"",
+							"pm.test(\"Событие должно имет поле commentsSize и количество комментариев должно быть равно 2\", function () {",
+							"    pm.expect(target).to.have.property(\"commentsSize\");",
+							"    pm.expect(target.commentsSize).equal(2);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/events/:eventId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"events",
+						":eventId"
+					],
+					"variable": [
+						{
+							"key": "eventId",
+							"value": "{{eid}}"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [

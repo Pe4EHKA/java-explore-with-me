@@ -17,7 +17,5 @@ public class CommentDto {
 
     private Long userId;
 
-    @NotBlank
-    @Length(min = 1, max = 2048)
     private String text;
 }

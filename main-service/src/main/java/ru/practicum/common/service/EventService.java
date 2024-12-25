@@ -32,16 +32,4 @@ public interface EventService {
     Set<EventShortDto> getAllEvents(PublicRequestParamForEvent publicRequestParamForEvent);
 
     EventFullDto getEvent(Long eventId, HttpServletRequest httpServletRequest);
-
-    List<CommentDto> getAllComments(Long eventId);
-
-    CommentDto getComment(Long eventId, Long commentId);
-
-    CommentDto saveComment(Long eventId, Long userId, NewCommentDto newCommentDto);
-
-    CommentDto updateComment(Long eventId, Long userId, CommentDto commentDto);
-
-    void deleteComment(Long eventId, Long userId);
-
-    void deleteComment(Long commentId);
 }

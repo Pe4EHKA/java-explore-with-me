@@ -11,6 +11,7 @@ import ru.practicum.common.dto.event.*;
 import ru.practicum.common.dto.request.ParticipationRequestDto;
 import ru.practicum.common.enums.Status;
 import ru.practicum.common.exception.ConflictException;
+import ru.practicum.common.service.CommentService;
 import ru.practicum.common.service.EventService;
 
 import java.util.List;
@@ -22,6 +23,8 @@ import java.util.List;
 public class PrivateEventsController {
 
     private final EventService privateEventService;
+
+    private final CommentService privateCommentService;
 
     @GetMapping
     public List<EventShortDto> getAllEvents(@PathVariable("userId") Long userId,
@@ -83,7 +86,7 @@ public class PrivateEventsController {
                                   @Valid @RequestBody NewCommentDto newCommentDto) {
         log.info("POST Private Event Comment [eventId={}, userId={}, newCommentDto={}]",
                 eventId, userId, newCommentDto);
-        return privateEventService.saveComment(eventId, userId, newCommentDto);
+        return privateCommentService.saveComment(eventId, userId, newCommentDto);
     }
 
     @PatchMapping("/{eventId}/comments")
@@ -93,7 +96,7 @@ public class PrivateEventsController {
         log.info("PATCH Private Event Comment [eventId={}, userId={}, commentDto={}]",
                 eventId, userId, commentDto);
 
-        return privateEventService.updateComment(eventId, userId, commentDto);
+        return privateCommentService.updateComment(eventId, userId, commentDto);
     }
 
     @DeleteMapping("/{eventId}/comments")
@@ -102,6 +105,6 @@ public class PrivateEventsController {
                               @PathVariable("userId") Long userId) {
         log.info("DELETE Private Event Comment [eventId={}, userId={}]", eventId, userId);
 
-        privateEventService.deleteComment(eventId, userId);
+        privateCommentService.deleteComment(eventId, userId);
     }
 }

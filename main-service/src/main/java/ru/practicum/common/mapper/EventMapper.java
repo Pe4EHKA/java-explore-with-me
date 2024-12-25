@@ -87,6 +87,7 @@ public class EventMapper {
                 .state(event.getState())
                 .title(event.getTitle())
                 .views(views != null ? views : 0L)
+                .commentsSize(event.getComments() != null ? event.getComments().size() : 0)
                 .build();
     }
 
@@ -100,6 +101,7 @@ public class EventMapper {
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .paid(event.getPaid())
                 .title(event.getTitle())
+                .commentsSize(event.getComments() != null ? event.getComments().size() : 0)
                 .build();
     }
 }
