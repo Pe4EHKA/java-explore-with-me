@@ -26,11 +26,9 @@ import ru.practicum.common.exception.NotFoundException;
 import ru.practicum.common.mapper.EventMapper;
 import ru.practicum.common.mapper.PropertyMerger;
 import ru.practicum.common.mapper.RequestMapper;
-import ru.practicum.common.model.Category;
-import ru.practicum.common.model.Event;
-import ru.practicum.common.model.EventSearch;
-import ru.practicum.common.model.Request;
+import ru.practicum.common.model.*;
 import ru.practicum.common.repository.CategoryRepository;
+import ru.practicum.common.repository.CommentRepository;
 import ru.practicum.common.repository.RequestRepository;
 import ru.practicum.common.repository.UserRepository;
 import ru.practicum.common.repository.event.EventRepository;
@@ -53,6 +51,8 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
 
     private final CategoryRepository categoryRepository;
+
+    private final CommentRepository commentRepository;
 
     private final String serviceName = "ewm-main-service";
 
@@ -167,7 +167,7 @@ public class EventServiceImpl implements EventService {
 
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() ->
-                        new NotFoundException("Event not found with id: " + eventId + "and userId: " + userId));
+                        new NotFoundException("Event not found with id: " + eventId + " and userId: " + userId));
 
         String status = updateEventStatusRequest.getStatus();
 
@@ -301,6 +301,7 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(event, views);
     }
 
+
     private Map<Long, Long> getViewsEvents(List<String> uris) {
         Map<Long, Long> views = new HashMap<>();
 
@@ -312,6 +313,9 @@ public class EventServiceImpl implements EventService {
         HitStatsDto[] stats = new HitStatsDto[0];
 
         try {
+            if (response.getBody() == null || response.getBody().toString().equals("[]")) {
+                return views;
+            }
             stats = objectMapper.readValue(objectMapper.writeValueAsString(response.getBody()),
                     HitStatsDto[].class);
         } catch (Exception e) {

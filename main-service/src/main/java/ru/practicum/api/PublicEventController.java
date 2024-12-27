@@ -4,8 +4,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.common.dto.comment.CommentDto;
 import ru.practicum.common.dto.event.EventFullDto;
 import ru.practicum.common.dto.event.EventShortDto;
+import ru.practicum.common.service.CommentService;
 import ru.practicum.common.service.EventService;
 import ru.practicum.api.dto.PublicRequestParamForEvent;
 
@@ -19,7 +21,9 @@ import java.util.Set;
 @Slf4j
 public class PublicEventController {
 
-    public final EventService eventService;
+    private final EventService eventService;
+
+    private final CommentService commentService;
 
     @GetMapping
     public Set<EventShortDto> getAllEvents(@RequestParam(required = false) String text,
@@ -50,10 +54,26 @@ public class PublicEventController {
         return eventService.getAllEvents(publicRequestParamForEvent);
     }
 
-    @GetMapping("/{id}")
-    public EventFullDto getEvent(@PathVariable("id") Long id,
+    @GetMapping("/{eventId}")
+    public EventFullDto getEvent(@PathVariable("eventId") Long eventId,
                                  HttpServletRequest httpServletRequest) {
-        log.info("Get event with id {}", id);
-        return eventService.getEvent(id, httpServletRequest);
+        log.info("Get event with event Id {}", eventId);
+
+        return eventService.getEvent(eventId, httpServletRequest);
+    }
+
+    @GetMapping("/{eventId}/comments")
+    public List<CommentDto> getComments(@PathVariable("eventId") Long eventId) {
+        log.info("Get comment with event Id {}", eventId);
+
+        return commentService.getAllComments(eventId);
+    }
+
+    @GetMapping("/{eventId}/comments/{commentId}")
+    public CommentDto getComment(@PathVariable("eventId") Long eventId,
+                                 @PathVariable("commentId") Long commentId) {
+        log.info("Get comment with comment Id {}  and event Id {}", commentId, eventId);
+
+        return commentService.getComment(eventId, commentId);
     }
 }

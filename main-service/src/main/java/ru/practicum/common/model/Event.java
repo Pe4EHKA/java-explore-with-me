@@ -5,6 +5,7 @@ import lombok.*;
 import ru.practicum.common.enums.State;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -66,4 +67,7 @@ public class Event {
 
     @Column(name = "title", nullable = false)
     private String title;
+
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments;
 }

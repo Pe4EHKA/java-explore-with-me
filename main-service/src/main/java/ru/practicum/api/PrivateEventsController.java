@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.common.dto.comment.CommentDto;
+import ru.practicum.common.dto.comment.NewCommentDto;
 import ru.practicum.common.dto.event.*;
 import ru.practicum.common.dto.request.ParticipationRequestDto;
 import ru.practicum.common.enums.Status;
 import ru.practicum.common.exception.ConflictException;
+import ru.practicum.common.service.CommentService;
 import ru.practicum.common.service.EventService;
 
 import java.util.List;
@@ -20,6 +23,8 @@ import java.util.List;
 public class PrivateEventsController {
 
     private final EventService privateEventService;
+
+    private final CommentService privateCommentService;
 
     @GetMapping
     public List<EventShortDto> getAllEvents(@PathVariable("userId") Long userId,
@@ -74,5 +79,32 @@ public class PrivateEventsController {
         return privateEventService.updateRequestStatus(userId, eventId, eventRequestStatusUpdateRequest);
     }
 
+    @PostMapping("/{eventId}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto saveComment(@PathVariable("eventId") Long eventId,
+                                  @PathVariable("userId") Long userId,
+                                  @Valid @RequestBody NewCommentDto newCommentDto) {
+        log.info("POST Private Event Comment [eventId={}, userId={}, newCommentDto={}]",
+                eventId, userId, newCommentDto);
+        return privateCommentService.saveComment(eventId, userId, newCommentDto);
+    }
 
+    @PatchMapping("/{eventId}/comments")
+    public CommentDto updateComment(@PathVariable("eventId") Long eventId,
+                                    @PathVariable("userId") Long userId,
+                                    @RequestBody CommentDto commentDto) {
+        log.info("PATCH Private Event Comment [eventId={}, userId={}, commentDto={}]",
+                eventId, userId, commentDto);
+
+        return privateCommentService.updateComment(eventId, userId, commentDto);
+    }
+
+    @DeleteMapping("/{eventId}/comments")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(@PathVariable("eventId") Long eventId,
+                              @PathVariable("userId") Long userId) {
+        log.info("DELETE Private Event Comment [eventId={}, userId={}]", eventId, userId);
+
+        privateCommentService.deleteComment(eventId, userId);
+    }
 }
